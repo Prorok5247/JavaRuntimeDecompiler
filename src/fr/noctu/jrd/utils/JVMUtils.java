@@ -13,6 +13,14 @@ public class JVMUtils {
         return new JVM().intConstant("oopSize");
     }
 
+    public static long getDataOfArray(String arrayName){
+        return new JVM().type(arrayName).offset("_data");
+    }
+
+    public static int getFieldSlot(){
+        return new JVM().intConstant("FieldInfo::field_slots");
+    }
+
     public static String getSymbol(JVM jvm, long symbolAddress) {
         Type symbolType = jvm.type("Symbol");
         long symbol = jvm.getAddress(symbolAddress);
@@ -36,9 +44,26 @@ public class JVMUtils {
         return null;
     }
 
+    public static Map<String, Number> getJvmConstants(JVM jvm){
+        try {
+            java.lang.reflect.Field field = jvm.getClass().getDeclaredField("constants");
+            field.setAccessible(true);
+            return (Map<String, Number>) field.get(jvm);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static void listTypes(JVM jvm){
         Objects.requireNonNull(getJvmTypes(jvm)).forEach((s, type) -> {
             System.out.println(s + "  " + type.name);
+        });
+    }
+
+    public static void listConstants(JVM jvm){
+        Objects.requireNonNull(getJvmConstants(jvm)).forEach((s, constant) -> {
+            System.out.println(s);
         });
     }
 

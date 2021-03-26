@@ -15,6 +15,7 @@ public class JavaKlass {
     private int sourceFileNameIndex;
 
     private ArrayList<JavaMethod> methods;
+    private ArrayList<JavaField> fields;
 
     public JavaKlass(Class<?> baseClass){
         this.baseClass = baseClass;
@@ -44,6 +45,14 @@ public class JavaKlass {
         for(int i = 0; i<methodCount; i++){
             methods.add(new JavaMethod(this, jvm.getAddress(methodsData + i * JVMUtils.getOopSize())));
         }
+
+        fields = new ArrayList<>();
+        long fieldsArrayAddress = jvm.getAddress(getJavaKlassAddress() + jvm.type("InstanceKlass").offset("_fields"));
+        long fieldsArrayDatas = JVMUtils.getDataOfArray("Array<u2>");
+        int javaFieldsCount = jvm.getShort(getJavaKlassAddress() +  jvm.type("InstanceKlass").offset("_java_fields_count"));
+        for(int i = 0; i<javaFieldsCount; i++){
+            fields.add(new JavaField(this, fieldsArrayAddress + fieldsArrayDatas + i * JVMUtils.getFieldSlot() * 2));
+        }
     }
 
     public Class<?> getBaseClass(){
@@ -72,5 +81,9 @@ public class JavaKlass {
 
     public ArrayList<JavaMethod> getMethods(){
         return methods;
+    }
+
+    public ArrayList<JavaField> getFields(){
+        return fields;
     }
 }

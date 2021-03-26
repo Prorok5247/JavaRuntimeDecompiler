@@ -46,7 +46,7 @@ public class JavaMethod {
         return ConstantPool.Symbol.asString(constantPool.getInfoAt(methodSignatureIndex));
     }
 
-    public int getFlags(){
+    public int getMethodFlags(){
         return flags;
     }
 }

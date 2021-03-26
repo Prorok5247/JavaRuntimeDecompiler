@@ -36,12 +36,10 @@ public class ConstantPool {
 
         static String asString(long symbol) {
             int length = jvm.getShort(symbol + _length) & 0xffff;
-
             byte[] data = new byte[length];
             for (int i = 0; i < data.length; i++) {
                 data[i] = jvm.getByte(symbol + _body + i);
             }
-
             return new String(data, StandardCharsets.UTF_8);
         }
     }
