@@ -5,10 +5,20 @@ import one.helfy.JVM;
 import one.helfy.Type;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class JVMUtils {
+    public static Vector getClassesList(ClassLoader classloader) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+        Class<?> classLoaderClass = classloader.getClass();
+        while (classLoaderClass != java.lang.ClassLoader.class) {
+            classLoaderClass = classLoaderClass.getSuperclass();
+        }
+        java.lang.reflect.Field classesField = classLoaderClass.getDeclaredField("classes");
+        classesField.setAccessible(true);
+        Vector classes = (Vector) classesField.get(classloader);
+        return classes;
+    }
+
     public static int getOopSize(){
         return new JVM().intConstant("oopSize");
     }

@@ -1,12 +1,9 @@
 package fr.noctu.jrd;
 
-import fr.noctu.jrd.javaobjects.JavaField;
 import fr.noctu.jrd.javaobjects.JavaKlass;
-import fr.noctu.jrd.javaobjects.JavaMethod;
-import fr.noctu.jrd.javaobjects.utils.JavaOpcode;
 
 public class JavaRuntimeDecompiler {
-    public int diplomatic = 2;
+    /*public int diplomatic = 2;
 
     public void test1(int rien){
         System.out.println("oui");
@@ -16,14 +13,14 @@ public class JavaRuntimeDecompiler {
 
     private void test2(){
         System.out.println("bruh");
-    }
+    }*/
 
     public JavaKlass decompileClass(Class<?> clazz){
         return new JavaKlass(clazz);
     }
 
     // TEST //
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         JavaRuntimeDecompiler javaRuntimeDecompiler = new JavaRuntimeDecompiler();
         JavaKlass javaKlass = javaRuntimeDecompiler.decompileClass(JavaRuntimeDecompiler.class);
         System.out.println(javaKlass.getMajorVersion() + "." + javaKlass.getMinorVersion());
@@ -41,5 +38,5 @@ public class JavaRuntimeDecompiler {
         for (JavaField field : javaKlass.getFields()) {
             System.out.println(field.getFieldName() + "  " + field.getFieldSignature());
         }
-    }
+    }*/
 }
