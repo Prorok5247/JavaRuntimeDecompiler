@@ -15,7 +15,7 @@ public class JavaRuntimeDecompiler {
         System.out.println(javaKlass.getMajorVersion() + "." + javaKlass.getMinorVersion());
         System.out.println(javaKlass.getSourceFileName());
         for (JavaMethod method : javaKlass.getMethods()) {
-            System.out.println(method.getMethodName());
+            System.out.println(method.getMethodName() + "  " + method.getMethodSignature());
         }
     }
 }

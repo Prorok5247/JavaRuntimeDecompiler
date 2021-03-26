@@ -8,7 +8,7 @@ public class JavaMethod {
     private long address;
 
     private ConstantPool constantPool;
-    private int methodNameIndex;
+    private int methodNameIndex, methodSignatureIndex, flags;
 
     public JavaMethod(JavaKlass owner, long address){
         this.jvm = new JVM();
@@ -26,6 +26,12 @@ public class JavaMethod {
 
         long methodNameOffset = jvm.type("ConstMethod").offset("_name_index");
         methodNameIndex = jvm.getShort(address + methodNameOffset);
+
+        long methodSignatureIndexOffset = jvm.type("ConstMethod").offset("_signature_index");
+        methodSignatureIndex = jvm.getShort(address + methodSignatureIndexOffset);
+
+        long flagsOffset = jvm.type("ConstMethod").offset("_flags");
+        flags = jvm.getShort(address + flagsOffset);
     }
 
     public ConstantPool getConstantPool(){
@@ -34,5 +40,13 @@ public class JavaMethod {
 
     public String getMethodName(){
         return ConstantPool.Symbol.asString(constantPool.getInfoAt(methodNameIndex));
+    }
+
+    public String getMethodSignature(){
+        return ConstantPool.Symbol.asString(constantPool.getInfoAt(methodSignatureIndex));
+    }
+
+    public int getFlags(){
+        return flags;
     }
 }
