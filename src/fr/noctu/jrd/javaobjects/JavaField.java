@@ -1,13 +1,19 @@
 package fr.noctu.jrd.javaobjects;
 
+import fr.noctu.jrd.javaobjects.utils.accessflags.AccessFlagsUtils;
+import fr.noctu.jrd.javaobjects.utils.accessflags.FieldAccessFlags;
 import one.helfy.JVM;
+
+import java.util.ArrayList;
 
 public class JavaField {
     private JVM jvm;
     private JavaKlass owner;
     private long address;
 
-    private int fieldNameIndex, fieldSignatureIndex, fieldFlags;
+    private int fieldNameIndex, fieldSignatureIndex;
+    private long fieldFlagsAddress;
+    private ArrayList<FieldAccessFlags> fieldFlags;
 
     public JavaField(JavaKlass owner, long address){
         this.jvm = new JVM();
@@ -24,7 +30,9 @@ public class JavaField {
         fieldSignatureIndex = jvm.getShort(address + fieldSignatureIndexConstant * 2);
 
         long fieldFlagsConstant = jvm.intConstant("FieldInfo::access_flags_offset");
-        fieldFlags = jvm.getShort(address + fieldFlagsConstant * 2);
+        fieldFlagsAddress = address + fieldFlagsConstant * 2;
+        short fieldFlagsShort = jvm.getShort(address + fieldFlagsConstant * 2);
+        fieldFlags = AccessFlagsUtils.getFieldAccessFlags(fieldFlagsShort);
     }
 
     public String getFieldName(){
@@ -35,7 +43,11 @@ public class JavaField {
         return owner.getConstantPool().getConstantPoolObject().getUTF8At(fieldSignatureIndex);
     }
 
-    public int getFieldFlags(){
+    public ArrayList<FieldAccessFlags> getFieldFlags(){
         return fieldFlags;
+    }
+
+    public void setFieldFlags(FieldAccessFlags... accessFlags){
+        jvm.putShort(fieldFlagsAddress, AccessFlagsUtils.buildFieldAccessFlags(accessFlags));
     }
 }

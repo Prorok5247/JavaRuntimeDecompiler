@@ -224,7 +224,6 @@ public enum JavaOpcode {
 
     private final int opcodeValue;
     private final int argsNumber;
-    public String arguments = "";
     JavaOpcode(int opcodeValue, int argsNumber){
         this.opcodeValue = opcodeValue;
         this.argsNumber = argsNumber;

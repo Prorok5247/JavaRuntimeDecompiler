@@ -2,6 +2,9 @@ package fr.noctu.jrd.javaobjects;
 
 import fr.noctu.jrd.javaobjects.utils.JavaInstruction;
 import fr.noctu.jrd.javaobjects.utils.JavaOpcode;
+import fr.noctu.jrd.javaobjects.utils.accessflags.AccessFlagsUtils;
+import fr.noctu.jrd.javaobjects.utils.accessflags.FieldAccessFlags;
+import fr.noctu.jrd.javaobjects.utils.accessflags.MethodAccessFlags;
 import fr.noctu.jrd.utils.JVMUtils;
 import one.helfy.JVM;
 
@@ -13,7 +16,9 @@ public class JavaMethod {
     private long address;
 
     private JavaConstantPool javaConstantPool;
-    private int methodNameIndex, methodSignatureIndex, flags;
+    private int methodNameIndex, methodSignatureIndex;
+    private long methodFlagsAddress;
+    private ArrayList<MethodAccessFlags> methodFlags;
 
     public JavaMethod(JavaKlass owner, long address){
         this.jvm = new JVM();
@@ -36,7 +41,9 @@ public class JavaMethod {
         methodSignatureIndex = jvm.getShort(address + methodSignatureIndexOffset);
 
         long flagsOffset = jvm.type("ConstMethod").offset("_flags");
-        flags = jvm.getShort(address + flagsOffset);
+        methodFlagsAddress = address + flagsOffset;
+        short methodFlagsShort = jvm.getShort(methodFlagsAddress);
+        methodFlags = AccessFlagsUtils.getMethodAccessFlags(methodFlagsShort);
 
         parseMethodCode();
     }
@@ -256,8 +263,12 @@ public class JavaMethod {
         return javaConstantPool.getConstantPoolObject().getUTF8At(methodSignatureIndex);
     }
 
-    public int getMethodFlags(){
-        return flags;
+    public ArrayList<MethodAccessFlags> getMethodFlags(){
+        return methodFlags;
+    }
+
+    public void setMethodFlags(MethodAccessFlags... accessFlags){
+        jvm.putShort(methodFlagsAddress, AccessFlagsUtils.buildMethoddAccessFlags(accessFlags));
     }
 
     public int getCodeSize(){
