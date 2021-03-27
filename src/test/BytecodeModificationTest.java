@@ -19,13 +19,13 @@ public class BytecodeModificationTest {
         JVM jvm = new JVM();
 
         for (JavaMethod method : javaKlass.getMethods()) {
-            if(method.getMethodName().equals("add")){
+            if(method.getMethodName().equals("add")){ // get method with name "add"
                 for (byte codeByte : method.getCodeBytes()) {
-                    System.out.print((codeByte & 0xFF) + " ");
+                    System.out.print((codeByte & 0xFF) + " "); // print bytes
                 }
                 System.out.println();
-                System.out.println(JVM.getUnsafe().getByte(method.getMethodInstructions().get(0).getAddress()));
-                method.setFirstOccureOfInstruction(JavaOpcode.IADD, JavaOpcode.IMUL);
+                System.out.println(JVM.getUnsafe().getByte(method.getMethodInstructions().get(0).getAddress())); // print the first instruction of the method
+                method.setFirstOccureOfInstruction(JavaOpcode.IADD, JavaOpcode.IMUL); // replacing the first occurence of IADD with IMUL (replace addition per multiplication)
             }
         }
 
