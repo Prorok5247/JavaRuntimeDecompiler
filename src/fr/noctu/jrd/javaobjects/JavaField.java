@@ -28,11 +28,11 @@ public class JavaField {
     }
 
     public String getFieldName(){
-        return ConstantPool.Symbol.asString(owner.getConstantPool().getInfoAt(fieldNameIndex));
+        return owner.getConstantPool().getConstantPoolObject().getUTF8At(fieldNameIndex);
     }
 
     public String getFieldSignature(){
-        return ConstantPool.Symbol.asString(owner.getConstantPool().getInfoAt(fieldSignatureIndex));
+        return owner.getConstantPool().getConstantPoolObject().getUTF8At(fieldSignatureIndex);
     }
 
     public int getFieldFlags(){

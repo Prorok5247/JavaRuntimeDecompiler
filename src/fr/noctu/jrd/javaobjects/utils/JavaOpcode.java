@@ -40,6 +40,7 @@ public enum JavaOpcode {
     SALOAD(53, 0),
 
     ONEWARRAY(189, 2),
+    ARRAYLENGTH(190, 0),
     MULTIANEWARRAY(197, 3),
 
     ARETURN(176, 0),
@@ -47,8 +48,6 @@ public enum JavaOpcode {
     FRETURN(174, 0),
     IRETURN(172, 0),
     LRETURN(173, 0),
-
-    ARRAYLENGTH(190, 0),
 
     DCONST_0(14, 0),
     DCONST_1(15, 0),
@@ -201,6 +200,7 @@ public enum JavaOpcode {
     JST(168, 2),
     JST_W(201, 4),
     LDC(18, 1),
+    LDC2(230, 1),
     LDC_W(19, 2),
     LDC2_W(20, 2),
     LOOKUPSWITCH(171, 11),
@@ -208,6 +208,7 @@ public enum JavaOpcode {
     MONITOREXIT(195, 0),
     NEW(187, 2),
     NEWARRAY(188, 1),
+    ANEWARRAY(189, 2),
     POP(87, 0),
     POP2(88, 0),
     GETFIELD(180, 2),

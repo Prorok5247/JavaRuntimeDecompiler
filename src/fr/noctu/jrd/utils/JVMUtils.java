@@ -1,9 +1,14 @@
 package fr.noctu.jrd.utils;
 
+import fr.noctu.jrd.javaobjects.ConstantPool;
 import one.helfy.Field;
 import one.helfy.JVM;
 import one.helfy.Type;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -81,5 +86,36 @@ public class JVMUtils {
         for (Field field : type.fields) {
             System.out.println(field.name + "  " + field.typeName + (field.isStatic ? "  static" : ""));
         }
+    }
+
+    public static sun.reflect.ConstantPool getConstantPoolOfClass(Class<?> clazz){
+        try {
+            Method method = clazz.getClass().getDeclaredMethod("getConstantPool");
+            method.setAccessible(true);
+            return (sun.reflect.ConstantPool) method.invoke(clazz);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static int byteToUnsignedByte(byte bite){
+        return Byte.toUnsignedInt(bite);
+    }
+
+    public static int getUnsignedShort(byte firstByte, byte secondByte){
+        return getShortFromTwoBytes(firstByte, secondByte) & 0xFFFF;
+    }
+
+    public static short getShortFromTwoBytes(byte firstByte, byte secondByte){
+        return (short) ((firstByte << 8) | secondByte);
+    }
+
+    public static int getIntFromFourBytes(byte firstByte, byte second, byte thirdByte, byte fourthByte){
+        return (firstByte << 24) | (second << 16) | (thirdByte << 8) | fourthByte;
+    }
+
+    public static int signExtendIntFromShort(short baseShort){
+        return baseShort & 0xFF;
     }
 }

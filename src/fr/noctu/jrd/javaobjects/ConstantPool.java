@@ -8,22 +8,39 @@ import java.nio.charset.StandardCharsets;
 public class ConstantPool {
     public static JVM jvm;
 
+    private sun.reflect.ConstantPool constantPoolObject;
     private final long address;
     private final long headerSize;
 
-    public ConstantPool(JVM jvm, long address){
+    public ConstantPool(JVM jvm, JavaKlass ownerClass, long address){
         this.jvm = jvm;
         this.address = address;
         this.headerSize = jvm.type("ConstantPool").size;
+        this.constantPoolObject = JVMUtils.getConstantPoolOfClass(ownerClass.getBaseClass());
     }
 
-    public int getLength(){
+    public int tagAt(int index){
+        long tagsArrayAddress = jvm.getAddress(address + jvm.type("ConstantPool").offset("_tags"));
+        long datasOffset = JVMUtils.getDataOfArray("Array<u1>");
+        long datasAddress = tagsArrayAddress + datasOffset;
+        for(int i = 0; i<getLength(); i++){
+            if(i == index)
+             return jvm.getByte(datasAddress + i);
+        }
+        return -1;
+    }
+
+     public int getLength(){
         long lengthOffset = jvm.type("ConstantPool").offset("_length");
         return jvm.getInt(address + lengthOffset);
     }
 
     public long getInfoAt(int index){
         return jvm.getAddress(address + headerSize + index * JVMUtils.getOopSize());
+    }
+
+    public sun.reflect.ConstantPool getConstantPoolObject(){
+        return constantPoolObject;
     }
 
     public long getAddress() {
