@@ -3,7 +3,7 @@ package test;
 import fr.noctu.jrd.JavaRuntimeDecompiler;
 import fr.noctu.jrd.javaobjects.JavaField;
 import fr.noctu.jrd.javaobjects.JavaKlass;
-import fr.noctu.jrd.javaobjects.JavaMethod;
+import fr.noctu.jrd.javaobjects.method.JavaMethod;
 import fr.noctu.jrd.javaobjects.utils.JavaInstruction;
 import fr.noctu.jrd.javaobjects.utils.accessflags.FieldAccessFlags;
 
@@ -17,7 +17,7 @@ public class JrdTest {
         System.out.println(javaKlass.getClassName()); // print the class name
 
         for (JavaMethod method : javaKlass.getMethods()) { // for on the methods
-            System.out.println(method.getMethodName() + "  " + method.getMethodSignature()); // print the name and signature of the method
+            System.out.println(method.getMethodName() + "  " + method.getMethodSignature() + "  " + method.getMaxLocals() + "  " + method.getMaxStack()); // print the name and signature of the method
             System.out.println(method.getMethodFlags()); // get the method flags
             for (byte codeByte : method.getCodeBytes()) { // for on the method code bytes
                 System.out.print((codeByte & 0xFF) + " "); // print each byte of the method code

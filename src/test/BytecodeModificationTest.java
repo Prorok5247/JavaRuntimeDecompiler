@@ -2,7 +2,7 @@ package test;
 
 import fr.noctu.jrd.JavaRuntimeDecompiler;
 import fr.noctu.jrd.javaobjects.JavaKlass;
-import fr.noctu.jrd.javaobjects.JavaMethod;
+import fr.noctu.jrd.javaobjects.method.JavaMethod;
 import fr.noctu.jrd.javaobjects.utils.JavaOpcode;
 import one.helfy.JVM;
 
@@ -22,9 +22,10 @@ public class BytecodeModificationTest {
         while (true){
             counter++;
 
-            if(counter == 4){
-                for (JavaMethod method : javaKlass.getMethods()) {
-                    if(method.getMethodName().equals("add")){ // get method with name "add"
+            for (JavaMethod method : javaKlass.getMethods()) {
+                if(method.getMethodName().equals("add")){ // get method with name "add"
+                    System.out.println(method.getJavaMethodCounters().getInvocationCounter().getCounter());
+                    if(counter == 4){
                         method.clearMethodInstructions(); // clear all instructions of the method
                         method.setInstruction(0, JavaOpcode.ICONST_2); // add iconst2 instruction
                         method.setInstruction(1, JavaOpcode.IRETURN); // add IRETURN instruction

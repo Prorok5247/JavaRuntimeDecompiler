@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="JavaRuntimeDecompiler:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/JavaRuntimeDecompiler_jar</output-path>
+    <root id="archive" name="JavaRuntimeDecompiler.jar">
+      <element id="module-output" name="JavaRuntimeDecompiler" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/libs/Helfy.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

@@ -1,9 +1,10 @@
-package fr.noctu.jrd.javaobjects;
+package fr.noctu.jrd.javaobjects.method;
 
+import fr.noctu.jrd.javaobjects.JavaConstantPool;
+import fr.noctu.jrd.javaobjects.JavaKlass;
 import fr.noctu.jrd.javaobjects.utils.JavaInstruction;
 import fr.noctu.jrd.javaobjects.utils.JavaOpcode;
 import fr.noctu.jrd.javaobjects.utils.accessflags.AccessFlagsUtils;
-import fr.noctu.jrd.javaobjects.utils.accessflags.FieldAccessFlags;
 import fr.noctu.jrd.javaobjects.utils.accessflags.MethodAccessFlags;
 import fr.noctu.jrd.utils.JVMUtils;
 import one.helfy.JVM;
@@ -15,8 +16,10 @@ public class JavaMethod {
     private JavaKlass owner;
     private long address;
 
+    private JavaMethodCounters javaMethodCounters;
+
     private JavaConstantPool javaConstantPool;
-    private int methodNameIndex, methodSignatureIndex;
+    private int methodNameIndex, methodSignatureIndex, maxStack, maxLocals;
     private long methodFlagsAddress;
     private ArrayList<MethodAccessFlags> methodFlags;
 
@@ -29,6 +32,7 @@ public class JavaMethod {
 
     private void setupMethod(){
         long constMethodOffset = jvm.type("Method").offset("_constMethod");
+        javaMethodCounters = new JavaMethodCounters(this, address + jvm.type("Method").offset("_method_counters"));
         address = jvm.getAddress(address + constMethodOffset);
 
         long constantPoolOffset = jvm.type("ConstMethod").offset("_constants");
@@ -44,6 +48,12 @@ public class JavaMethod {
         methodFlagsAddress = address + flagsOffset;
         short methodFlagsShort = jvm.getShort(methodFlagsAddress);
         methodFlags = AccessFlagsUtils.getMethodAccessFlags(methodFlagsShort);
+
+        long maxStackOffset = jvm.type("ConstMethod").offset("_max_stack");
+        maxStack = jvm.getShort(address + maxStackOffset);
+
+        long maxLocalsOffset = jvm.type("ConstMethod").offset("_max_locals");
+        maxLocals = jvm.getShort(address + maxLocalsOffset);
 
         parseMethodCode();
     }
@@ -251,6 +261,10 @@ public class JavaMethod {
         setupMethod();
     }
 
+    public JavaMethodCounters getJavaMethodCounters(){
+        return javaMethodCounters;
+    }
+
     public JavaConstantPool getConstantPool(){
         return javaConstantPool;
     }
@@ -281,6 +295,14 @@ public class JavaMethod {
 
     public byte[] getCodeBytes(){
         return codeBytes;
+    }
+
+    public int getMaxStack() {
+        return maxStack;
+    }
+
+    public int getMaxLocals() {
+        return maxLocals;
     }
 
     public ArrayList<JavaInstruction> getMethodInstructions(){

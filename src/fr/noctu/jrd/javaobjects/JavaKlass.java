@@ -1,5 +1,6 @@
 package fr.noctu.jrd.javaobjects;
 
+import fr.noctu.jrd.javaobjects.method.JavaMethod;
 import fr.noctu.jrd.utils.JVMUtils;
 import one.helfy.JVM;
 
