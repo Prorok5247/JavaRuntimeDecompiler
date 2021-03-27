@@ -2,17 +2,19 @@ package fr.noctu.jrd.javaobjects;
 
 import fr.noctu.jrd.utils.JVMUtils;
 import one.helfy.JVM;
+import sun.reflect.ConstantPool;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
-public class ConstantPool {
+public class JavaConstantPool {
     public static JVM jvm;
 
-    private sun.reflect.ConstantPool constantPoolObject;
+    private final ConstantPool constantPoolObject;
     private final long address;
     private final long headerSize;
 
-    public ConstantPool(JVM jvm, JavaKlass ownerClass, long address){
+    public JavaConstantPool(JVM jvm, JavaKlass ownerClass, long address){
         this.jvm = jvm;
         this.address = address;
         this.headerSize = jvm.type("ConstantPool").size;
@@ -20,12 +22,10 @@ public class ConstantPool {
     }
 
     public int tagAt(int index){
-        long tagsArrayAddress = jvm.getAddress(address + jvm.type("ConstantPool").offset("_tags"));
-        long datasOffset = JVMUtils.getDataOfArray("Array<u1>");
-        long datasAddress = tagsArrayAddress + datasOffset;
+        long tagsDataAddress = getTagsDataAddress();
         for(int i = 0; i<getLength(); i++){
             if(i == index)
-             return jvm.getByte(datasAddress + i);
+             return jvm.getByte(tagsDataAddress + i);
         }
         return -1;
     }
@@ -39,12 +39,18 @@ public class ConstantPool {
         return jvm.getAddress(address + headerSize + index * JVMUtils.getOopSize());
     }
 
-    public sun.reflect.ConstantPool getConstantPoolObject(){
+    public ConstantPool getConstantPoolObject(){
         return constantPoolObject;
     }
 
     public long getAddress() {
         return address;
+    }
+
+    private long getTagsDataAddress(){
+        long tagsArrayAddress = jvm.getAddress(address + jvm.type("ConstantPool").offset("_tags"));
+        long datasOffset = JVMUtils.getDataOfArray("Array<u1>");
+        return tagsArrayAddress + datasOffset;
     }
 
     static class Symbol {

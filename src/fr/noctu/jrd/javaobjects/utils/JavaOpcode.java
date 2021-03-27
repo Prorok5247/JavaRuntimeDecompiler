@@ -212,6 +212,7 @@ public enum JavaOpcode {
     POP(87, 0),
     POP2(88, 0),
     GETFIELD(180, 2),
+    GETFIELD2(203, 2),
     PUTFIELD(181, 2),
     PUTSTATIC(179, 2),
     RET(169, 1),

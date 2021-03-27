@@ -1,14 +1,11 @@
 package fr.noctu.jrd.utils;
 
-import fr.noctu.jrd.javaobjects.ConstantPool;
 import one.helfy.Field;
 import one.helfy.JVM;
 import one.helfy.Type;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 

@@ -12,6 +12,7 @@ public class JrdTest {
         JavaKlass javaKlass = javaRuntimeDecompiler.decompileClass(JavaKlass.class); //decompile the class JavaKlass
         System.out.println(javaKlass.getMajorVersion() + "." + javaKlass.getMinorVersion()); // printing the version of the class
         System.out.println(javaKlass.getClassName()); // printing the class name
+
         for (JavaMethod method : javaKlass.getMethods()) { // for on the methods
             System.out.println(method.getMethodName() + "  " + method.getMethodSignature()); // printing the name and signature of the method
             for (byte codeByte : method.getCodeBytes()) { // for on the method code bytes

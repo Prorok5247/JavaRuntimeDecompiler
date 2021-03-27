@@ -1,6 +1,5 @@
 package fr.noctu.jrd.javaobjects;
 
-import com.sun.org.apache.bcel.internal.generic.ANEWARRAY;
 import fr.noctu.jrd.javaobjects.utils.JavaInstruction;
 import fr.noctu.jrd.javaobjects.utils.JavaOpcode;
 import fr.noctu.jrd.utils.JVMUtils;
@@ -13,7 +12,7 @@ public class JavaMethod {
     private JavaKlass owner;
     private long address;
 
-    private ConstantPool constantPool;
+    private JavaConstantPool javaConstantPool;
     private int methodNameIndex, methodSignatureIndex, flags;
 
     public JavaMethod(JavaKlass owner, long address){
@@ -28,7 +27,7 @@ public class JavaMethod {
         address = jvm.getAddress(address + constMethodOffset);
 
         long constantPoolOffset = jvm.type("ConstMethod").offset("_constants");
-        constantPool = new ConstantPool(jvm, owner, jvm.getAddress(address + constantPoolOffset));
+        javaConstantPool = new JavaConstantPool(jvm, owner, jvm.getAddress(address + constantPoolOffset));
 
         long methodNameOffset = jvm.type("ConstMethod").offset("_name_index");
         methodNameIndex = jvm.getShort(address + methodNameOffset);
@@ -65,7 +64,7 @@ public class JavaMethod {
             if(bytesToSkip == 0){
                 for (JavaOpcode value : JavaOpcode.values()) {
                     if((codeByte & 0xFF) == value.getOpcodeValue()){
-                        JavaInstruction javaInstruction = new JavaInstruction(value);
+                        JavaInstruction javaInstruction = new JavaInstruction(value, codeStartAddress + i);
                         if(value.getArgsNumber() != 0) {
                             bytesToSkip += value.getArgsNumber();
                             switch (value){
@@ -115,49 +114,49 @@ public class JavaMethod {
                                     break;
                                 case LDC:
                                     byte indexByte = codeBytes[i + 1];
-                                    int tag = constantPool.tagAt(indexByte);
+                                    int tag = javaConstantPool.tagAt(indexByte);
                                     switch (tag){
                                         case 7:
-                                            javaInstruction.appendArg(constantPool.getConstantPoolObject().getClassAt(indexByte).getName().replaceAll("\\.", "/"));
+                                            javaInstruction.appendArg(javaConstantPool.getConstantPoolObject().getClassAt(indexByte).getName().replaceAll("\\.", "/"));
                                             break;
                                         case 3:
-                                            javaInstruction.appendArg(String.valueOf(constantPool.getConstantPoolObject().getIntAt(indexByte)));
+                                            javaInstruction.appendArg(String.valueOf(javaConstantPool.getConstantPoolObject().getIntAt(indexByte)));
                                             break;
                                         case 4:
-                                            javaInstruction.appendArg(String.valueOf(constantPool.getConstantPoolObject().getFloatAt(indexByte)));
+                                            javaInstruction.appendArg(String.valueOf(javaConstantPool.getConstantPoolObject().getFloatAt(indexByte)));
                                             break;
                                         case 8:
-                                            javaInstruction.appendArg(constantPool.getConstantPoolObject().getStringAt(indexByte));
+                                            javaInstruction.appendArg(javaConstantPool.getConstantPoolObject().getStringAt(indexByte));
                                             break;
                                     }
                                     break;
                                 case LDC_W:
                                     short cpShortIndex = JVMUtils.getShortFromTwoBytes(codeBytes[i + 1], codeBytes[i + 2]);
-                                    int cpTag = constantPool.tagAt(cpShortIndex);
+                                    int cpTag = javaConstantPool.tagAt(cpShortIndex);
                                     switch (cpTag){
                                         case 7:
-                                            javaInstruction.appendArg(constantPool.getConstantPoolObject().getClassAt(cpShortIndex).getName().replaceAll("\\.", "/"));
+                                            javaInstruction.appendArg(javaConstantPool.getConstantPoolObject().getClassAt(cpShortIndex).getName().replaceAll("\\.", "/"));
                                             break;
                                         case 3:
-                                            javaInstruction.appendArg(String.valueOf(constantPool.getConstantPoolObject().getIntAt(cpShortIndex)));
+                                            javaInstruction.appendArg(String.valueOf(javaConstantPool.getConstantPoolObject().getIntAt(cpShortIndex)));
                                             break;
                                         case 4:
-                                            javaInstruction.appendArg(String.valueOf(constantPool.getConstantPoolObject().getFloatAt(cpShortIndex)));
+                                            javaInstruction.appendArg(String.valueOf(javaConstantPool.getConstantPoolObject().getFloatAt(cpShortIndex)));
                                             break;
                                         case 8:
-                                            javaInstruction.appendArg(constantPool.getConstantPoolObject().getStringAt(cpShortIndex));
+                                            javaInstruction.appendArg(javaConstantPool.getConstantPoolObject().getStringAt(cpShortIndex));
                                             break;
                                     }
                                     break;
                                 case LDC2_W:
                                     short cpShortIndex1 = JVMUtils.getShortFromTwoBytes(codeBytes[i + 1], codeBytes[i + 2]);
-                                    int cpTag1 = constantPool.tagAt(cpShortIndex1);
+                                    int cpTag1 = javaConstantPool.tagAt(cpShortIndex1);
                                     switch (cpTag1){
                                         case 5:
-                                            javaInstruction.appendArg(String.valueOf(constantPool.getConstantPoolObject().getLongAt(cpShortIndex1)));
+                                            javaInstruction.appendArg(String.valueOf(javaConstantPool.getConstantPoolObject().getLongAt(cpShortIndex1)));
                                             break;
                                         case 6:
-                                            javaInstruction.appendArg(String.valueOf(constantPool.getConstantPoolObject().getDoubleAt(cpShortIndex1)));
+                                            javaInstruction.appendArg(String.valueOf(javaConstantPool.getConstantPoolObject().getDoubleAt(cpShortIndex1)));
                                             break;
                                     }
                                     break;
@@ -166,7 +165,7 @@ public class JavaMethod {
                                 case ANEWARRAY:
                                 case CHECKCAST:
                                     short index = JVMUtils.getShortFromTwoBytes(codeBytes[i + 1], codeBytes[i + 2]);
-                                    javaInstruction.appendArg(constantPool.getConstantPoolObject().getClassAt(index).getName().replaceAll("\\.", "/"));
+                                    javaInstruction.appendArg(javaConstantPool.getConstantPoolObject().getClassAt(index).getName().replaceAll("\\.", "/"));
                                     break;
                                 case NEWARRAY:
                                     int arrayType = codeBytes[i + 1];
@@ -211,16 +210,44 @@ public class JavaMethod {
         }
     }
 
-    public ConstantPool getConstantPool(){
-        return constantPool;
+    public void setInstruction(int instructionIndex, JavaOpcode opcode){
+        JVM.getUnsafe().putByte(javaInstructions.get(instructionIndex).getAddress(), (byte) opcode.getOpcodeValue());
+    }
+
+    public void setFirstOccureOfInstruction(JavaOpcode baseOpcode, JavaOpcode newOpcode){
+        for (JavaInstruction javaInstruction : javaInstructions) {
+            if(javaInstruction.getOpcode() == baseOpcode) {
+                setInstruction(javaInstructions.indexOf(javaInstruction), newOpcode);
+                return;
+            }
+        }
+    }
+
+    public void setAllInstructionsOfAType(JavaOpcode baseOpcode, JavaOpcode newOpcode){
+        for (JavaInstruction javaInstruction : javaInstructions) {
+            if(javaInstruction.getOpcode() == baseOpcode)
+                setInstruction(javaInstructions.indexOf(javaInstruction), newOpcode);
+        }
+    }
+
+    public void setInstructionArgument(JavaInstruction javaInstruction, int argumentIndex, byte value){
+        JVM.getUnsafe().putByte(javaInstruction.getArgumentAddress(argumentIndex), value);
+    }
+
+    public void reloadMethod(){
+        setupMethod();
+    }
+
+    public JavaConstantPool getConstantPool(){
+        return javaConstantPool;
     }
 
     public String getMethodName(){
-        return constantPool.getConstantPoolObject().getUTF8At(methodNameIndex);
+        return javaConstantPool.getConstantPoolObject().getUTF8At(methodNameIndex);
     }
 
     public String getMethodSignature(){
-        return constantPool.getConstantPoolObject().getUTF8At(methodSignatureIndex);
+        return javaConstantPool.getConstantPoolObject().getUTF8At(methodSignatureIndex);
     }
 
     public int getMethodFlags(){

@@ -10,7 +10,7 @@ public class JavaKlass {
     private JVM jvm = new JVM();
 
     private long javaKlassAddress;
-    private ConstantPool constantPool;
+    private JavaConstantPool javaConstantPool;
     private int majorVersion, minorVersion;
     private int sourceFileNameIndex;
 
@@ -27,7 +27,7 @@ public class JavaKlass {
         javaKlassAddress = JVMUtils.getOopSize() == 8 ? JVM.unsafe.getLong(baseClass, klassOffset) : JVM.unsafe.getInt(baseClass, klassOffset) & 0xffffffffL;
 
         long constantPoolOffset = jvm.type("InstanceKlass").offset("_constants");
-        constantPool = new ConstantPool(jvm, this, jvm.getAddress(getJavaKlassAddress() + constantPoolOffset));
+        javaConstantPool = new JavaConstantPool(jvm, this, jvm.getAddress(getJavaKlassAddress() + constantPoolOffset));
 
         long minorVersionAddress = jvm.type("InstanceKlass").offset("_minor_version");
         long majorVersionAddress = jvm.type("InstanceKlass").offset("_major_version");
@@ -63,8 +63,8 @@ public class JavaKlass {
         return javaKlassAddress;
     }
 
-    public ConstantPool getConstantPool() {
-        return constantPool;
+    public JavaConstantPool getConstantPool() {
+        return javaConstantPool;
     }
 
     public int getMajorVersion() {
@@ -80,7 +80,7 @@ public class JavaKlass {
     }
 
     public String getSourceFileName(){
-        return constantPool.getConstantPoolObject().getUTF8At(sourceFileNameIndex);
+        return javaConstantPool.getConstantPoolObject().getUTF8At(sourceFileNameIndex);
     }
 
     public ArrayList<JavaMethod> getMethods(){
