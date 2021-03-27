@@ -9,7 +9,7 @@ import one.helfy.JVM;
 import java.util.concurrent.TimeUnit;
 
 public class BytecodeModificationTest {
-    private static int add(int i, int ii){
+    private static int add(int i){
         return i + 3;
     }
 
@@ -18,19 +18,21 @@ public class BytecodeModificationTest {
         JavaKlass javaKlass = javaRuntimeDecompiler.decompileClass(BytecodeModificationTest.class);
         JVM jvm = new JVM();
 
-        for (JavaMethod method : javaKlass.getMethods()) {
-            if(method.getMethodName().equals("add")){ // get method with name "add"
-                for (byte codeByte : method.getCodeBytes()) {
-                    System.out.print((codeByte & 0xFF) + " "); // print bytes
-                }
-                System.out.println();
-                System.out.println(JVM.getUnsafe().getByte(method.getMethodInstructions().get(0).getAddress())); // print the first instruction of the method
-                method.setFirstOccureOfInstruction(JavaOpcode.IADD, JavaOpcode.IMUL); // replacing the first occurence of IADD with IMUL (replace addition per multiplication)
-            }
-        }
-
+        int counter = 0;
         while (true){
-            System.out.println(add(2, 4));
+            counter++;
+
+            if(counter == 4){
+                for (JavaMethod method : javaKlass.getMethods()) {
+                    if(method.getMethodName().equals("add")){ // get method with name "add"
+                        method.clearMethodInstructions(); // clear all instructions of the method
+                        method.setInstruction(0, JavaOpcode.ICONST_2); // add iconst2 instruction
+                        method.setInstruction(1, JavaOpcode.IRETURN); // add IRETURN instruction
+                    }
+                }
+            }
+
+            System.out.println(add(2));
             try {
                 TimeUnit.SECONDS.sleep(1);
             } catch (InterruptedException e) {

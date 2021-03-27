@@ -234,6 +234,12 @@ public class JavaMethod {
         JVM.getUnsafe().putByte(javaInstruction.getArgumentAddress(argumentIndex), value);
     }
 
+    public void clearMethodInstructions(){
+        for(int i = 0; i<codeSize; i++){
+            JVM.getUnsafe().putByte(codeStartAddress + i, (byte) JavaOpcode.NOP.getOpcodeValue());
+        }
+    }
+
     public void reloadMethod(){
         setupMethod();
     }
