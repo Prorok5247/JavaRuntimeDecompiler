@@ -84,6 +84,7 @@ public class JavaMethod {
                 for (JavaOpcode value : JavaOpcode.values()) {
                     if((codeByte & 0xFF) == value.getOpcodeValue()){
                         JavaInstruction javaInstruction = new JavaInstruction(value, codeStartAddress + i);
+                        javaInstructions.add(javaInstruction);
                         if(value.getArgsNumber() != 0) {
                             bytesToSkip += value.getArgsNumber();
                             try{
@@ -224,7 +225,6 @@ public class JavaMethod {
                                 System.err.println("Arguments parsing crashed on instruction: " + value + " at index: " + i);
                             }
                         }
-                        javaInstructions.add(javaInstruction);
                     }
                 }
             }else{
