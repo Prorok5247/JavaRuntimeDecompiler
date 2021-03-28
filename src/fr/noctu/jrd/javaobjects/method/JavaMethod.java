@@ -21,6 +21,7 @@ public class JavaMethod {
     private JavaConstantPool javaConstantPool;
     private int methodNameIndex, methodSignatureIndex, maxStack, maxLocals;
     private long methodFlagsAddress;
+    private byte[] originalCode;
     private ArrayList<MethodAccessFlags> methodFlags;
 
     public JavaMethod(JavaKlass owner, long address){
@@ -72,6 +73,7 @@ public class JavaMethod {
         for(int i = 0; i<codeSize; i++){
             codeBytes[i] = jvm.getByte(codeStartAddress + i);
         }
+        this.originalCode = codeBytes;
 
         //Interpreting
         javaInstructions = new ArrayList<>();
@@ -254,6 +256,22 @@ public class JavaMethod {
     public void clearMethodInstructions(){
         for(int i = 0; i<codeSize; i++){
             JVM.getUnsafe().putByte(codeStartAddress + i, (byte) JavaOpcode.NOP.getOpcodeValue());
+        }
+    }
+
+    public void copyMethod(JavaMethod javaMethod){
+        if(codeSize >= javaMethod.getCodeSize()){
+            clearMethodInstructions();
+            for (int i = 0; i<javaMethod.codeSize; i++){
+                JVM.getUnsafe().putByte(codeStartAddress + i, javaMethod.codeBytes[i]);
+            }
+        }else
+            throw new RuntimeException("CodeSize is superior: original method codesize=" + codeSize + "  toCopyMethod codesize=" + javaMethod.getCodeSize());
+    }
+
+    public void restoreOriginalCode(){
+        for(int i = 0; i<codeSize; i++){
+            JVM.getUnsafe().putByte(codeStartAddress + i, originalCode[i]);
         }
     }
 

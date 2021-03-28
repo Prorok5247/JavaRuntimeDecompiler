@@ -4,19 +4,18 @@ import fr.noctu.jrd.JavaRuntimeDecompiler;
 import fr.noctu.jrd.javaobjects.JavaKlass;
 import fr.noctu.jrd.javaobjects.method.JavaMethod;
 import fr.noctu.jrd.javaobjects.utils.JavaOpcode;
-import one.helfy.JVM;
 
 import java.util.concurrent.TimeUnit;
 
 public class BytecodeModificationTest {
     private static int add(int i){
+        System.out.println("called");
         return i + 3;
     }
 
     public static void main(String[] args) {
         JavaRuntimeDecompiler javaRuntimeDecompiler = new JavaRuntimeDecompiler();
         JavaKlass javaKlass = javaRuntimeDecompiler.decompileClass(BytecodeModificationTest.class);
-        JVM jvm = new JVM();
 
         int counter = 0;
         while (true){
@@ -24,11 +23,12 @@ public class BytecodeModificationTest {
 
             for (JavaMethod method : javaKlass.getMethods()) {
                 if(method.getMethodName().equals("add")){ // get method with name "add"
-                    System.out.println(method.getJavaMethodCounters().getInvocationCounter().getCounter());
                     if(counter == 4){
                         method.clearMethodInstructions(); // clear all instructions of the method
-                        method.setInstruction(0, JavaOpcode.ICONST_2); // add iconst2 instruction
+                        method.setInstruction(0, JavaOpcode.ICONST_M1); // add iconst2 instruction
                         method.setInstruction(1, JavaOpcode.IRETURN); // add IRETURN instruction
+                    } else if(counter == 10){
+                        method.restoreOriginalCode();
                     }
                 }
             }

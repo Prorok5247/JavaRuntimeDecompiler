@@ -88,6 +88,14 @@ public class JavaKlass {
         return methods;
     }
 
+    public JavaMethod getMethodByName(String name){
+        for (JavaMethod method : getMethods()) {
+            if(method.getMethodName().equals(name))
+                return method;
+        }
+        return null;
+    }
+
     public ArrayList<JavaField> getFields(){
         return fields;
     }
