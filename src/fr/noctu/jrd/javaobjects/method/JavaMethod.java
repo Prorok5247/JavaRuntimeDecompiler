@@ -233,6 +233,11 @@ public class JavaMethod {
         }
     }
 
+    //This replace a byte to a new byte
+    public void setByteToNewByte(int byteIndex, byte newByte){
+        JVM.getUnsafe().putByte(codeStartAddress + byteIndex, newByte);
+    }
+
     //This replace a byte of instructions list
     public void setByteToNewInstruction(int byteIndex, JavaOpcode opcode){
         JVM.getUnsafe().putByte(codeStartAddress + byteIndex, (byte) opcode.getOpcodeValue());

@@ -6,4 +6,8 @@ public class JavaRuntimeDecompiler {
     public JavaKlass decompileClass(Class<?> clazz){
         return new JavaKlass(clazz);
     }
+
+    public JavaKlass decompileClassOfObject(Object object){
+        return new JavaKlass(object.getClass());
+    }
 }
