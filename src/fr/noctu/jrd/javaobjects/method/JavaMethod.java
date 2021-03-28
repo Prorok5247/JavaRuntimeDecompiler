@@ -229,36 +229,47 @@ public class JavaMethod {
         }
     }
 
-    public void setInstruction(int instructionIndex, JavaOpcode opcode){
+    //This replace a byte of instructions list
+    public void setByteToNewInstruction(int byteIndex, JavaOpcode opcode){
+        JVM.getUnsafe().putByte(codeStartAddress + byteIndex, (byte) opcode.getOpcodeValue());
+    }
+
+    //This replace an instruction
+    public void replaceInstruction(int instructionIndex, JavaOpcode opcode){
         JVM.getUnsafe().putByte(javaInstructions.get(instructionIndex).getAddress(), (byte) opcode.getOpcodeValue());
     }
 
+    //This replace the first occurence of an instruction
     public void setFirstOccureOfInstruction(JavaOpcode baseOpcode, JavaOpcode newOpcode){
         for (JavaInstruction javaInstruction : javaInstructions) {
             if(javaInstruction.getOpcode() == baseOpcode) {
-                setInstruction(javaInstructions.indexOf(javaInstruction), newOpcode);
+                replaceInstruction(javaInstructions.indexOf(javaInstruction), newOpcode);
                 return;
             }
         }
     }
 
+    //This replace all occurences of an instruction
     public void setAllInstructionsOfAType(JavaOpcode baseOpcode, JavaOpcode newOpcode){
         for (JavaInstruction javaInstruction : javaInstructions) {
             if(javaInstruction.getOpcode() == baseOpcode)
-                setInstruction(javaInstructions.indexOf(javaInstruction), newOpcode);
+                replaceInstruction(javaInstructions.indexOf(javaInstruction), newOpcode);
         }
     }
 
+    //This replace the argument of an instruction
     public void setInstructionArgument(JavaInstruction javaInstruction, int argumentIndex, byte value){
         JVM.getUnsafe().putByte(javaInstruction.getArgumentAddress(argumentIndex), value);
     }
 
+    //This clear all instructions of a method
     public void clearMethodInstructions(){
         for(int i = 0; i<codeSize; i++){
             JVM.getUnsafe().putByte(codeStartAddress + i, (byte) JavaOpcode.NOP.getOpcodeValue());
         }
     }
 
+    //This replace the current method by a new
     public void copyMethod(JavaMethod javaMethod){
         if(codeSize >= javaMethod.getCodeSize()){
             clearMethodInstructions();
@@ -269,7 +280,9 @@ public class JavaMethod {
             throw new RuntimeException("CodeSize is superior: original method codesize=" + codeSize + "  toCopyMethod codesize=" + javaMethod.getCodeSize());
     }
 
+    //This restore the original method code
     public void restoreOriginalCode(){
+        clearMethodInstructions();
         for(int i = 0; i<codeSize; i++){
             JVM.getUnsafe().putByte(codeStartAddress + i, originalCode[i]);
         }

@@ -25,8 +25,8 @@ public class BytecodeModificationTest {
                 if(method.getMethodName().equals("add")){ // get method with name "add"
                     if(counter == 4){
                         method.clearMethodInstructions(); // clear all instructions of the method
-                        method.setInstruction(0, JavaOpcode.ICONST_M1); // add iconst2 instruction
-                        method.setInstruction(1, JavaOpcode.IRETURN); // add IRETURN instruction
+                        method.setByteToNewInstruction(0, JavaOpcode.ICONST_M1); // add iconst2 instruction
+                        method.setByteToNewInstruction(1, JavaOpcode.IRETURN); // add IRETURN instruction
                     } else if(counter == 10){
                         method.restoreOriginalCode();
                     }
