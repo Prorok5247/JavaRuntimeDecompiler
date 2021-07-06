@@ -1,3 +1,5 @@
+# OUT DATED !! GONNA RELEASE A NEW RUNTIME DECOMPILER MUCH BETTER THAN THIS ONE
+
 # JavaRuntimeDecompiler
 
 ## What is this project ?
